@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Moldura Kayra Semijoias</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    .camera-container {
+      position: relative;
+      width: 100vw;
+      height: 80vh;
+      max-width: 450px;
+      max-height: 800px;
+      overflow: hidden;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      background-color: #000;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .frame-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      object-fit: cover;
+    }
+    .controls {
+      height: 20vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 16px;
+    }
+    .btn-capture {
+      background-color: #1E392A; /* Dark Forest Green */
+      color: #D4AF37; /* Gold */
+      border: 2px solid #D4AF37;
+      padding: 14px 28px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s ease;
+    }
+    .btn-capture:active {
+      transform: scale(0.95);
+    }
+    .instruction {
+      font-size: 13px;
+      color: #cccccc;
+      text-align: center;
+    }
+    canvas {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="camera-container">
+    <video id="webcam" autoplay playsinline muted></video>
+    <!-- Your transparent botanical frame PNG overlay -->
+    <img id="frame" class="frame-overlay" src="frame.png" alt="Kayra Frame">
+  </div>
+
+  <div class="controls">
+    <button class="btn-capture" id="capture-btn">📸 Tirar Foto</button>
+    <p class="instruction">Tire sua foto, salve e marque <b>@kayra.semijoias</b> no Instagram!</p>
+  </div>
+
+  <canvas id="canvas"></canvas>
+
+  <script>
+    const video = document.getElementById('webcam');
+    const frame = document.getElementById('frame');
+    const captureBtn = document.getElementById('capture-btn');
+    const canvas = document.getElementById('canvas');
+
+    // Start mobile camera stream
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user', width: { ideal: 1080 }, height: { ideal: 1920 } },
+          audio: false
+        });
+        video.srcObject = stream;
+      } catch (err) {
+        alert('Por favor, permita o acesso à câmera para usar a moldura Kayra.');
+        console.error('Camera access error:', err);
+      }
+    }
+
+    // Capture photo with frame overlay merged
+    captureBtn.addEventListener('click', () => {
+      const context = canvas.getContext('2d');
+      canvas.width = video.videoWidth || 1080;
+      canvas.height = video.videoHeight || 1920;
+
+      // Draw camera feed
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      // Draw frame overlay on top
+      context.drawImage(frame, 0, 0, canvas.width, canvas.height);
+
+      // Download photo
+      const imageURL = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.href = imageURL;
+      link.download = 'MeuMomentoKayra.png';
+      link.click();
+    });
+
+    window.addEventListener('load', startCamera);
+  </script>
+</body>
+</html>
