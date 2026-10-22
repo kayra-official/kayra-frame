@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Moldura Kayra Semijoias</title>
+  <title>Moldura #MeuMomentoKayra</title>
   <style>
     * {
       box-sizing: border-box;
@@ -24,12 +24,12 @@
     .camera-container {
       position: relative;
       width: 100vw;
-      height: 80vh;
+      height: 75vh;
       max-width: 450px;
       max-height: 800px;
       overflow: hidden;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
       background-color: #000;
     }
     video {
@@ -47,33 +47,38 @@
       object-fit: cover;
     }
     .controls {
-      height: 20vh;
+      height: 25vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 12px;
       padding: 16px;
+      text-align: center;
     }
     .btn-capture {
-      background-color: #1E392A; /* Dark Forest Green */
-      color: #D4AF37; /* Gold */
+      background-color: #1E392A; /* Verde Floresta Kayra */
+      color: #D4AF37; /* Dourado */
       border: 2px solid #D4AF37;
-      padding: 14px 28px;
+      padding: 14px 32px;
       font-size: 16px;
-      font-weight: bold;
+      font-weight: 600;
       border-radius: 30px;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      transition: transform 0.2s ease;
+      box-shadow: 0 4px 14px rgba(212, 175, 55, 0.25);
+      transition: all 0.2s ease;
     }
     .btn-capture:active {
       transform: scale(0.95);
     }
     .instruction {
       font-size: 13px;
-      color: #cccccc;
-      text-align: center;
+      color: #d1d1d1;
+      max-width: 320px;
+      line-height: 1.4;
+    }
+    .instruction b {
+      color: #D4AF37;
     }
     canvas {
       display: none;
@@ -84,13 +89,14 @@
 
   <div class="camera-container">
     <video id="webcam" autoplay playsinline muted></video>
-    <!-- Your transparent botanical frame PNG overlay -->
-    <img id="frame" class="frame-overlay" src="frame.png" alt="Kayra Frame">
+    <img id="frame" class="frame-overlay" src="frame.png" alt="Moldura Kayra">
   </div>
 
   <div class="controls">
     <button class="btn-capture" id="capture-btn">📸 Tirar Foto</button>
-    <p class="instruction">Tire sua foto, salve e marque <b>@kayra.semijoias</b> no Instagram!</p>
+    <p class="instruction">
+      Tire sua foto, salve na galeria e poste nos Stories marcando <b>@kayra.semijoias</b> com a hashtag <b>#MeuMomentoKayra</b>!
+    </p>
   </div>
 
   <canvas id="canvas"></canvas>
@@ -101,7 +107,6 @@
     const captureBtn = document.getElementById('capture-btn');
     const canvas = document.getElementById('canvas');
 
-    // Start mobile camera stream
     async function startCamera() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -111,22 +116,24 @@
         video.srcObject = stream;
       } catch (err) {
         alert('Por favor, permita o acesso à câmera para usar a moldura Kayra.');
-        console.error('Camera access error:', err);
+        console.error('Erro na câmera:', err);
       }
     }
 
-    // Capture photo with frame overlay merged
     captureBtn.addEventListener('click', () => {
       const context = canvas.getContext('2d');
       canvas.width = video.videoWidth || 1080;
       canvas.height = video.videoHeight || 1920;
 
-      // Draw camera feed
+      // Desenha o vídeo da câmera
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      // Draw frame overlay on top
-      context.drawImage(frame, 0, 0, canvas.width, canvas.height);
+      
+      // Se a imagem da moldura estiver carregada, desenha por cima
+      if (frame.complete && frame.naturalWidth !== 0) {
+        context.drawImage(frame, 0, 0, canvas.width, canvas.height);
+      }
 
-      // Download photo
+      // Download da foto pronta
       const imageURL = canvas.toDataURL('image/png');
       const link = document.createElement('a');
       link.href = imageURL;
